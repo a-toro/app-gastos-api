@@ -8,8 +8,8 @@ interface AppErrorConstructor {
 export class AppError extends Error {
   public readonly name: string;
   public readonly description: string;
-  public readonly statusCode?: number;
-  public readonly isOperational?: boolean;
+  public readonly statusCode: number;
+  public readonly isOperational: boolean;
 
   constructor({
     name,
