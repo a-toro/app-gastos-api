@@ -1,4 +1,4 @@
-import { User } from "../models/User";
+import { User } from "@prisma/client";
 
 export interface CreateUserDto
   extends Omit<User, "id" | "createAt" | "updateAt"> {}

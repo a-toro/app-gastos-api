@@ -5,6 +5,7 @@ import { User } from "../models/User";
 import { EnvConfig } from "../../config/env";
 import { AppError } from "../../error/AppError";
 import { HttpCode } from "../../utils/HttpCode";
+import prisma from "../../lib/prisma";
 
 export class AuthServiceImpl implements AuthService {
   async register({
@@ -20,7 +21,6 @@ export class AuthServiceImpl implements AuthService {
         name,
         password: hashPassword,
         status: false,
-        roleId,
       },
       select: {
         id: true,
@@ -29,7 +29,6 @@ export class AuthServiceImpl implements AuthService {
         name: true,
         email: true,
         status: true,
-        roleId: true,
         password: false,
       },
     });
@@ -51,7 +50,7 @@ export class AuthServiceImpl implements AuthService {
     if (!user) {
       throw new AppError({
         name: "LoginError",
-        description: "Email o contraseÃ±a incorrectos",
+        description: "Email o contraseña incorrectos",
         statusCode: HttpCode.BadRequest,
         isOperational: false,
       });
@@ -62,7 +61,7 @@ export class AuthServiceImpl implements AuthService {
     if (!passwordMatch) {
       throw new AppError({
         name: "LoginError",
-        description: "Email o contraseÃ±a incorrectos",
+        description: "Email o contraseña incorrectos",
         statusCode: HttpCode.BadRequest,
         isOperational: false,
       });
