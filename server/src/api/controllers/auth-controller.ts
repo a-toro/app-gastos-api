@@ -8,6 +8,7 @@ import { HttpCode } from "../../utils/HttpCode";
 import { createToken } from "../../utils/jsonwebtoken";
 import { HandleResponse } from "../../network/response";
 import { EnvConfig } from "../../config/env";
+import { createUserSchema, loginSchema } from "../schemas/auth-schemas";
 
 const autService = new AuthServiceImpl();
 
@@ -17,7 +18,24 @@ export async function createUser(
   next: NextFunction
 ) {
   try {
-    const { email } = req.body;
+    const { success, error, data } = createUserSchema.safeParse(req.body);
+
+    if (!success) {
+      const errors = error.issues.map((issue) => ({
+        path: issue.path.join("."),
+        message: issue.message,
+      }));
+      res.status(HttpCode.BadRequest).json(
+        new HandleResponse({
+          errors,
+          message: "Bad request",
+          status: HttpCode.BadRequest,
+        })
+      );
+      return;
+    }
+
+    const { email } = data;
 
     const findUser = await prisma.user.findUnique({
       where: {
@@ -78,7 +96,24 @@ export async function login(
   next: NextFunction
 ) {
   try {
-    const user = await autService.login(req.body);
+    const { success, error, data } = loginSchema.safeParse(req.body);
+
+    if (!success) {
+      const errors = error.issues.map((issue) => ({
+        path: issue.path.join("."),
+        message: issue.message,
+      }));
+      res.status(HttpCode.BadRequest).json(
+        new HandleResponse({
+          errors,
+          message: "Bad request",
+          status: HttpCode.BadRequest,
+        })
+      );
+      return;
+    }
+
+    const user = await autService.login(data);
 
     const token = createToken({ id: user.id, email: user.email });
 
